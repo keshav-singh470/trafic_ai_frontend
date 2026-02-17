@@ -1,6 +1,10 @@
 {
     "rewrites": [
         {
+            "source": "/api/:match*",
+            "destination": "https://ai-trafic.servepics.com/:match*"
+        },
+        {
             "source": "/(.*)",
             "destination": "/index.html"
         }
