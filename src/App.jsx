@@ -98,7 +98,9 @@ function App() {
     formData.append('case_type', selectedCase);
 
     try {
-      const res = await axios.post(`${API_BASE}/upload`, formData);
+      //const res = await axios.post(`${API_BASE}/upload`, formData);
+      const res = await axios.post("/api/upload", formData);
+
       setJobId(res.data.job_id);
     } catch (e) {
       console.error("Upload failed", e);
