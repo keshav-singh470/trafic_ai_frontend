@@ -2,7 +2,7 @@
     "rewrites": [
         {
             "source": "/api/:match*",
-            "destination": "http://ai-trafic.servepics.com:8000/:match*"
+            "destination": "https://ai-trafic.servepics.com/:match*"
         },
         {
             "source": "/(.*)",
