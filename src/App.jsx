@@ -99,7 +99,9 @@ function App() {
 
     try {
       //const res = await axios.post(`${API_BASE}/upload`, formData);
-      const res = await axios.post("/api/upload", formData);
+      //const res = await axios.post(`${API_BASE}/upload`, formData);
+      // Use direct API base URL to bypass Vercel limits
+      const res = await axios.post(`${API_BASE}/upload`, formData);
 
       setJobId(res.data.job_id);
     } catch (e) {
