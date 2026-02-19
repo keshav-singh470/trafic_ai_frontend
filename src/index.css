@@ -27,7 +27,13 @@ body {
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 2rem;
+  }
 }
 
 .glass-card {
@@ -150,9 +156,27 @@ body {
 
 .cases-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: 1fr;
   gap: 1rem;
   margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+  .cases-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .cases-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .cases-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .case-card {
@@ -230,4 +254,26 @@ body {
   background: rgba(239, 68, 68, 0.1);
   color: var(--error);
   font-size: 0.75rem;
+}
+
+.table-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 640px) {
+  .violations-table th,
+  .violations-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.8rem;
+  }
+  
+  .id-badge {
+    padding: 0.125rem 0.25rem;
+    font-size: 0.7rem;
+  }
+  
+  .plate-code {
+    font-size: 0.7rem;
+  }
 }

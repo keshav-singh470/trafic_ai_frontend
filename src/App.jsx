@@ -7,6 +7,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
+// Resolve image URL:
+// - Presigned S3 URL (starts with https://) → use as-is
+// - Local path (starts with /) → prepend API_BASE
+// - null/undefined → null
+const resolveImgUrl = (url) => {
+  if (!url) return null;
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  return `${API_BASE}${url}`;
+};
+
 const TRAFFIC_CASES = [
   { id: 'anpr', title: 'Number Plate', icon: <Search size={24} />, description: 'AI License Plate recognition' },
   { id: 'wrong_side', title: 'Wrong Side', icon: <Navigation size={24} />, description: 'Illegal direction detection' },
@@ -112,14 +122,14 @@ function App() {
 
   return (
     <div className="container">
-      <header className="header" style={{ textAlign: 'center', padding: '3rem 0' }}>
+      <header className="header px-4 py-8 md:py-12 lg:py-16 text-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="gradient-text" style={{ fontSize: '3.5rem', marginBottom: '0.5rem' }}>Smart Traffic AI</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem' }}>State-of-the-art Neural Analytics & Automated Reporting</p>
+          <h1 className="gradient-text text-3xl md:text-5xl lg:text-6xl font-extrabold mb-2 md:mb-4">Smart Traffic AI</h1>
+          <p className="text-sm md:text-lg lg:text-xl text-[var(--text-muted)]">State-of-the-art Neural Analytics & Automated Reporting</p>
         </motion.div>
       </header>
 
@@ -133,9 +143,9 @@ function App() {
               exit={{ opacity: 0 }}
             >
               <div className="cases-section">
-                <div className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                  <ShieldPlus size={32} color="var(--primary)" />
-                  <h3 style={{ fontSize: '1.8rem' }}>1. Select Detection Module</h3>
+                <div className="section-title flex items-center gap-4 mb-6 md:mb-8">
+                  <ShieldPlus className="size-6 md:size-8" color="var(--primary)" />
+                  <h3 className="text-xl md:text-2xl font-semibold">1. Select Detection Module</h3>
                 </div>
                 <div className="cases-grid">
                   {TRAFFIC_CASES.map(tc => (
@@ -149,21 +159,21 @@ function App() {
                 </div>
               </div>
 
-              <div className="section-title" style={{ marginTop: '4rem', display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                <Upload size={32} color="var(--primary)" />
-                <h3 style={{ fontSize: '1.8rem' }}>2. Upload Target Video</h3>
+              <div className="section-title flex items-center gap-4 mt-12 md:mt-16 mb-6 md:mb-8">
+                <Upload className="size-6 md:size-8" color="var(--primary)" />
+                <h3 className="text-xl md:text-2xl font-semibold">2. Upload Target Video</h3>
               </div>
 
               <motion.div
-                className="glass-card upload-area"
+                className="glass-card upload-area p-8 md:p-12 lg:p-16 text-center cursor-pointer"
                 whileHover={{ scale: 1.01, borderColor: 'var(--primary)' }}
                 whileTap={{ scale: 0.99 }}
                 onClick={() => document.getElementById('fileInput').click()}
-                style={{ padding: '4rem', textAlign: 'center', border: '2px dashed rgba(255,255,255,0.1)' }}
+                style={{ border: '2px dashed rgba(255,255,255,0.1)' }}
               >
-                <Smartphone size={64} className="pulse" color="var(--primary)" style={{ marginBottom: '1.5rem' }} />
-                <h3 style={{ fontSize: '1.5rem' }}>Drop your .mp4 here or Click to Browse</h3>
-                <p style={{ color: 'var(--text-muted)', marginTop: '1rem', fontSize: '1.1rem' }}>
+                <Smartphone className="size-12 md:size-16 pulse mx-auto mb-4 md:mb-6" color="var(--primary)" />
+                <h3 className="text-lg md:text-2xl font-semibold">Drop your .mp4 here or Click to Browse</h3>
+                <p className="text-sm md:text-base text-[var(--text-muted)] mt-2 md:mt-4">
                   Process video for high-accuracy <b>{TRAFFIC_CASES.find(c => c.id === selectedCase)?.title}</b>
                 </p>
                 <input
@@ -171,7 +181,7 @@ function App() {
                   type="file"
                   accept="video/mp4"
                   onChange={handleUpload}
-                  style={{ display: 'none' }}
+                  className="hidden"
                 />
               </motion.div>
             </motion.div>
@@ -182,24 +192,23 @@ function App() {
               key="processing"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="glass-card"
-              style={{ textAlign: 'center', marginTop: '5rem', padding: '3rem' }}
+              className="glass-card text-center mt-12 md:mt-20 p-6 md:p-12"
             >
               <div className="loading-container">
-                <Loader2 size={48} className="animate-spin" style={{ color: 'var(--primary)', marginBottom: '1.5rem' }} />
-                <h3 style={{ fontSize: '1.8rem' }}>Intelligent Analysis in Progress...</h3>
-                <p style={{ color: 'var(--text-muted)', marginTop: '0.5rem', fontSize: '1.1rem' }}>
+                <Loader2 className="size-10 md:size-12 animate-spin mx-auto mb-4 md:mb-6 text-[var(--primary)]" />
+                <h3 className="text-xl md:text-2xl font-semibold">Intelligent Analysis in Progress...</h3>
+                <p className="text-sm md:text-base text-[var(--text-muted)] mt-2">
                   Running <b>{TRAFFIC_CASES.find(c => c.id === selectedCase)?.title}</b> neural pipeline
                 </p>
               </div>
 
               {/* Live Report Table */}
-              <div style={{ marginTop: '3rem', textAlign: 'left' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                  <FileText size={24} color="var(--primary)" />
-                  <h3 style={{ fontSize: '1.4rem' }}>Live Violation Stream</h3>
+              <div className="mt-8 md:mt-12 text-left">
+                <div className="flex items-center gap-3 mb-4 md:mb-6">
+                  <FileText className="size-6 text-[var(--primary)]" />
+                  <h3 className="text-lg md:text-xl font-semibold">Live Violation Stream</h3>
                 </div>
-                <div className="table-container" style={{ background: 'rgba(255,255,255,0.01)', borderRadius: '1rem', padding: '1rem' }}>
+                <div className="table-container bg-white/5 rounded-xl p-2 md:p-4">
                   <table className="violations-table">
                     <thead>
                       <tr>
@@ -218,13 +227,21 @@ function App() {
                           <td style={{ color: 'var(--primary)', fontWeight: 600 }}>{row.Type}</td>
                           <td><code className="plate-code">{row.Plate || 'N/A'}</code></td>
                           <td>
-                            {row.CropImgUrl ? (
-                              <a href={row.FullImgUrl?.startsWith('http') ? row.FullImgUrl : `${API_BASE}${row.FullImgUrl}`} target="_blank" rel="noreferrer" title="View Full Evidence">
+                            {resolveImgUrl(row.plate_image || row.CropImgUrl) ? (
+                              <a
+                                href={resolveImgUrl(row.vehicle_image || row.FullImgUrl)}
+                                target="_blank" rel="noreferrer" title="View Full Evidence"
+                              >
                                 <img
-                                  src={row.CropImgUrl?.startsWith('http') ? row.CropImgUrl : `${API_BASE}${row.CropImgUrl}`}
-                                  alt="Violation"
+                                  src={resolveImgUrl(row.plate_image || row.CropImgUrl)}
+                                  alt={row.extracted_number || 'Violation'}
                                   style={{ height: '40px', borderRadius: '4px', border: '1px solid var(--primary)', cursor: 'zoom-in' }}
+                                  onError={(e) => {
+                                    e.target.style.display = 'none';
+                                    e.target.nextSibling.style.display = 'inline';
+                                  }}
                                 />
+                                <span style={{ display: 'none', color: 'var(--error)', fontSize: '0.75rem' }}>⚠ Load failed</span>
                               </a>
                             ) : (
                               <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>-</span>
@@ -250,13 +267,12 @@ function App() {
               key="results"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              className="glass-card results-section"
-              style={{ padding: '3rem' }}
+              className="glass-card results-section p-6 md:p-12"
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
-                <h2 style={{ fontSize: '2.2rem' }}>Analysis Insights</h2>
-                <span className="status-badge status-completed" style={{ padding: '0.5rem 1.5rem', fontSize: '1rem' }}>
-                  <CheckCircle size={18} style={{ marginRight: '0.5rem' }} /> Success
+              <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8 md:mb-12">
+                <h2 className="text-2xl md:text-3xl font-bold">Analysis Insights</h2>
+                <span className="status-badge status-completed w-fit px-4 py-2 text-sm md:text-base">
+                  <CheckCircle size={18} className="mr-2 inline" /> Success
                 </span>
               </div>
 
@@ -268,13 +284,13 @@ function App() {
                 </div>
               )}
 
-              <div style={{ marginTop: '5rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                  <FileText size={32} color="var(--primary)" />
-                  <h3 style={{ fontSize: '1.8rem' }}>Automated Violation Report</h3>
+              <div className="mt-12 md:mt-20">
+                <div className="flex items-center gap-3 mb-6 md:mb-8">
+                  <FileText className="size-8 text-[var(--primary)]" />
+                  <h3 className="text-xl md:text-2xl font-semibold">Automated Violation Report</h3>
                 </div>
 
-                <div className="table-container" style={{ background: 'rgba(255,255,255,0.02)', borderRadius: '1rem', padding: '1rem' }}>
+                <div className="table-container bg-white/5 rounded-xl p-2 md:p-4">
                   <table className="violations-table">
                     <thead>
                       <tr>
@@ -293,13 +309,21 @@ function App() {
                           <td style={{ color: 'var(--primary)', fontWeight: 600 }}>{row.Type}</td>
                           <td><code className="plate-code">{row.Plate || 'N/A'}</code></td>
                           <td>
-                            {row.CropImgUrl ? (
-                              <a href={row.FullImgUrl?.startsWith('http') ? row.FullImgUrl : `${API_BASE}${row.FullImgUrl}`} target="_blank" rel="noreferrer" title="View Full Evidence">
+                            {resolveImgUrl(row.plate_image || row.CropImgUrl) ? (
+                              <a
+                                href={resolveImgUrl(row.vehicle_image || row.FullImgUrl)}
+                                target="_blank" rel="noreferrer" title="View Full Evidence"
+                              >
                                 <img
-                                  src={row.CropImgUrl?.startsWith('http') ? row.CropImgUrl : `${API_BASE}${row.CropImgUrl}`}
-                                  alt="Violation"
+                                  src={resolveImgUrl(row.plate_image || row.CropImgUrl)}
+                                  alt={row.extracted_number || 'Violation'}
                                   style={{ height: '40px', borderRadius: '4px', border: '1px solid var(--primary)', cursor: 'zoom-in' }}
+                                  onError={(e) => {
+                                    e.target.style.display = 'none';
+                                    e.target.nextSibling.style.display = 'inline';
+                                  }}
                                 />
+                                <span style={{ display: 'none', color: 'var(--error)', fontSize: '0.75rem' }}>⚠ Load failed</span>
                               </a>
                             ) : (
                               <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>-</span>
@@ -318,8 +342,8 @@ function App() {
                 </div>
               </div>
 
-              <div style={{ marginTop: '4rem', textAlign: 'center' }}>
-                <button className="btn btn-primary btn-large" onClick={() => window.location.reload()}>
+              <div className="mt-12 md:mt-16 text-center">
+                <button className="btn btn-primary w-full md:w-auto px-8 py-3 text-lg" onClick={() => window.location.reload()}>
                   Start New Session
                 </button>
               </div>
@@ -331,15 +355,14 @@ function App() {
               key="error"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="glass-card"
-              style={{ textAlign: 'center', border: '2px solid var(--error)', padding: '5rem', marginTop: '5rem' }}
+              className="glass-card text-center border-2 border-[var(--error)] p-8 md:p-20 mt-12 md:mt-20"
             >
-              <AlertCircle size={64} color="var(--error)" style={{ marginBottom: '1.5rem' }} />
-              <h3 style={{ fontSize: '2rem' }}>Analysis Pipeline Interrupted</h3>
-              <p style={{ color: 'var(--text-muted)', marginTop: '1rem', fontSize: '1.2rem' }}>
+              <AlertCircle className="size-12 md:size-16 mx-auto mb-6 text-[var(--error)]" />
+              <h3 className="text-2xl md:text-3xl font-bold">Analysis Pipeline Interrupted</h3>
+              <p className="text-sm md:text-lg text-[var(--text-muted)] mt-4">
                 The AI service encountered an unexpected state. Please check the video format.
               </p>
-              <button className="btn btn-primary" style={{ marginTop: '2.5rem', padding: '1rem 3rem' }} onClick={() => window.location.reload()}>
+              <button className="btn btn-primary w-full md:w-auto mt-8 px-8 py-3" onClick={() => window.location.reload()}>
                 Re-initialize System
               </button>
             </motion.div>
