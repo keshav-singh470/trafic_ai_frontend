@@ -60,6 +60,10 @@ function App() {
   const [report, setReport] = useState([]);
   const [videoUrl, setVideoUrl] = useState(null);
   const [selectedCase, setSelectedCase] = useState('anpr');
+  const [searchPlate, setSearchPlate] = useState('');
+  const [searchResults, setSearchResults] = useState(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState(null);
 
   useEffect(() => {
     let interval;
@@ -96,6 +100,25 @@ function App() {
     }
   };
 
+  const handleSearch = async (e) => {
+    if (e) e.preventDefault();
+    if (!searchPlate.trim()) return;
+
+    setIsSearching(true);
+    setSearchError(null);
+    setJobId(null); // Clear active job when searching
+
+    try {
+      const res = await axios.get(`${API_BASE}/search?plate=${searchPlate.trim().toUpperCase()}`);
+      setSearchResults(res.data);
+    } catch (e) {
+      console.error("Search failed", e);
+      setSearchError("Failed to fetch records. Please try again.");
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
   const handleUpload = async (e) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
@@ -128,13 +151,102 @@ function App() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="gradient-text text-3xl md:text-5xl lg:text-6xl font-extrabold mb-2 md:mb-4">Smart Traffic AI</h1>
-          <p className="text-sm md:text-lg lg:text-xl text-[var(--text-muted)]">State-of-the-art Neural Analytics & Automated Reporting</p>
+          <h1 className="gradient-text text-3xl md:text-5xl lg:text-6xl font-extrabold mb-2 md:mb-4">3rd AI APP</h1>
+          <p className="text-sm md:text-lg lg:text-xl text-[var(--text-muted)]">Vehicle Search & Violation System</p>
         </motion.div>
+
+        {/* Search Bar */}
+        <div className="search-section mt-8 md:mt-12">
+          <form onSubmit={handleSearch} className="search-bar-container">
+            <Search className="ml-3 text-[var(--text-muted)]" size={20} />
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search by Number Plate (e.g. KA02A1980)"
+              value={searchPlate}
+              onChange={(e) => setSearchPlate(e.target.value.toUpperCase())}
+            />
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={isSearching || !searchPlate.trim()}
+            >
+              {isSearching ? <Loader2 className="animate-spin" size={18} /> : "Search"}
+            </button>
+          </form>
+
+          {searchError && (
+            <p className="text-[var(--error)] text-sm mt-2">{searchError}</p>
+          )}
+        </div>
       </header>
 
       <main>
         <AnimatePresence mode="wait">
+          {/* Search Results Section */}
+          {searchResults && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-12"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold flex items-center gap-2">
+                  <FileText className="text-[var(--primary)]" />
+                  Search Results for "{searchPlate}"
+                </h3>
+                <button
+                  className="text-sm text-[var(--text-muted)] hover:text-white"
+                  onClick={() => setSearchResults(null)}
+                >
+                  Clear Results
+                </button>
+              </div>
+
+              {searchResults.length > 0 ? (
+                <div className="search-results-grid">
+                  {searchResults.map((res, index) => (
+                    <motion.div
+                      key={index}
+                      className="glass-card result-card"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.05 }}
+                    >
+                      <div className="result-image-container">
+                        <img
+                          src={resolveImgUrl(res.vehicle_image || res.FullImgUrl)}
+                          alt="Vehicle"
+                          className="result-image"
+                        />
+                        {resolveImgUrl(res.plate_image || res.CropImgUrl) && (
+                          <img
+                            src={resolveImgUrl(res.plate_image || res.CropImgUrl)}
+                            alt="Plate"
+                            className="result-plate-thumb"
+                          />
+                        )}
+                      </div>
+                      <div className="result-info">
+                        <div className="result-plate-text">{res.Plate}</div>
+                        <div className="result-type">{res.Type}</div>
+                        <div className="result-meta">
+                          <span>{new Date(res.created_at).toLocaleString()}</span>
+                          <span>Frame: {res.Frame}</span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              ) : (
+                <div className="glass-card p-12 text-center text-[var(--text-muted)]">
+                  No records found for this plate.
+                </div>
+              )}
+              <hr className="mt-12 border-white/5" />
+            </motion.div>
+          )}
+
           {!jobId && status !== 'processing' && (
             <motion.div
               key="selection"

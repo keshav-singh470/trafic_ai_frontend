@@ -262,18 +262,133 @@ body {
 }
 
 @media (max-width: 640px) {
+
   .violations-table th,
   .violations-table td {
     padding: 0.75rem 0.5rem;
     font-size: 0.8rem;
   }
-  
+
   .id-badge {
     padding: 0.125rem 0.25rem;
     font-size: 0.7rem;
   }
-  
+
   .plate-code {
     font-size: 0.7rem;
+  }
+}
+
+/* Search Section styles */
+.search-section {
+  max-width: 800px;
+  margin: 0 auto 4rem;
+}
+
+.search-bar-container {
+  display: flex;
+  gap: 0.5rem;
+  background: var(--card-bg);
+  padding: 0.5rem;
+  border-radius: 1rem;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 0.75rem 1rem;
+  color: white;
+  font-size: 1rem;
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.result-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.result-image-container {
+  position: relative;
+  aspect-ratio: 16/9;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  border: 1px solid var(--glass-border);
+}
+
+.result-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.result-card:hover .result-image {
+  transform: scale(1.05);
+}
+
+.result-plate-thumb {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  height: 40px;
+  border-radius: 4px;
+  border: 1px solid var(--primary);
+  background: black;
+}
+
+.result-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.result-plate-text {
+  font-family: monospace;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: 1px;
+}
+
+.result-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.result-type {
+  font-weight: 600;
+  color: var(--success);
+}
+
+.loading-inline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--text-muted);
+  margin-top: 1rem;
+}
+
+@media (max-width: 640px) {
+  .search-results-grid {
+    grid-template-columns: 1fr;
   }
 }
